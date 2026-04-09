@@ -1,93 +1,64 @@
 import org.junit.Test;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 import static org.junit.Assert.*;
 
 public class TrainManagementTest {
 
-    private List<Bogie> getBogies() {
-        List<Bogie> list = new ArrayList<>();
-        list.add(new Bogie("Sleeper", 72));
-        list.add(new Bogie("AC Chair", 56));
-        list.add(new Bogie("First Class", 24));
-        list.add(new Bogie("Sleeper", 70));
-        list.add(new Bogie("AC Chair", 60));
-        return list;
+    private boolean isValidTrainId(String trainId) {
+        return Pattern.matches("TRN-\\d{4}", trainId);
+    }
+
+    private boolean isValidCargoCode(String cargoCode) {
+        return Pattern.matches("PET-[A-Z]{2}", cargoCode);
     }
 
     @Test
-    public void testGrouping_BogiesGroupedByType() {
-        Map<String, List<Bogie>> map = getBogies().stream()
-                .collect(Collectors.groupingBy(b -> b.name));
-
-        assertTrue(map.containsKey("Sleeper"));
-        assertEquals(2, map.get("Sleeper").size());
+    public void testRegex_ValidTrainID() {
+        assertTrue(isValidTrainId("TRN-1234"));
     }
 
     @Test
-    public void testGrouping_MultipleBogiesInSameGroup() {
-        Map<String, List<Bogie>> map = getBogies().stream()
-                .collect(Collectors.groupingBy(b -> b.name));
-
-        assertEquals(2, map.get("AC Chair").size());
+    public void testRegex_InvalidTrainIDFormat() {
+        assertFalse(isValidTrainId("TRN-123"));
+        assertFalse(isValidTrainId("1234-TRN"));
+        assertFalse(isValidTrainId("trn-12"));
     }
 
     @Test
-    public void testGrouping_DifferentBogieTypes() {
-        Map<String, List<Bogie>> map = getBogies().stream()
-                .collect(Collectors.groupingBy(b -> b.name));
-
-        assertEquals(3, map.keySet().size());
+    public void testRegex_ValidCargoCode() {
+        assertTrue(isValidCargoCode("PET-VR"));
     }
 
     @Test
-    public void testGrouping_EmptyBogieList() {
-        List<Bogie> empty = new ArrayList<>();
-
-        Map<String, List<Bogie>> map = empty.stream()
-                .collect(Collectors.groupingBy(b -> b.name));
-
-        assertTrue(map.isEmpty());
+    public void testRegex_InvalidCargoCodeFormat() {
+        assertFalse(isValidCargoCode("PET- PVR"));
+        assertFalse(isValidCargoCode("PET-V"));
+        assertFalse(isValidCargoCode("PET-12"));
     }
 
     @Test
-    public void testGrouping_SingleBogieCategory() {
-        List<Bogie> list = Arrays.asList(
-                new Bogie("Sleeper", 72),
-                new Bogie("Sleeper", 70)
-        );
-
-        Map<String, List<Bogie>> map = list.stream()
-                .collect(Collectors.groupingBy(b -> b.name));
-
-        assertEquals(1, map.size());
+    public void testRegex_TrainIDDigitLengthValidation() {
+        assertFalse(isValidTrainId("TRN-1"));
+        assertFalse(isValidTrainId("TRN-12"));
+        assertFalse(isValidTrainId("TRN-12345"));
     }
 
     @Test
-    public void testGrouping_MapContainsCorrectKeys() {
-        Map<String, List<Bogie>> map = getBogies().stream()
-                .collect(Collectors.groupingBy(b -> b.name));
-
-        assertTrue(map.containsKey("Sleeper"));
-        assertTrue(map.containsKey("AC Chair"));
-        assertTrue(map.containsKey("First Class"));
+    public void testRegex_CargoCodeUppercaseValidation() {
+        assertFalse(isValidCargoCode("PET-vr"));
+        assertFalse(isValidCargoCode("pet-vr"));
     }
 
     @Test
-    public void testGrouping_GroupSizeValidation() {
-        Map<String, List<Bogie>> map = getBogies().stream()
-                .collect(Collectors.groupingBy(b -> b.name));
-
-        assertEquals(2, map.get("Sleeper").size());
+    public void testRegex_EmptyInputHandling() {
+        assertFalse(isValidTrainId(""));
+        assertFalse(isValidCargoCode(""));
     }
 
     @Test
-    public void testGrouping_OriginalListUnchanged() {
-        List<Bogie> original = getBogies();
-
-        Map<String, List<Bogie>> map = original.stream()
-                .collect(Collectors.groupingBy(b -> b.name));
-
-        assertEquals(5, original.size());
+    public void testRegex_ExactPatternMatch() {
+        assertFalse(isValidTrainId("TRN-1234X"));
+        assertFalse(isValidCargoCode("PET-ABC"));
     }
 }
