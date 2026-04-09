@@ -1,27 +1,14 @@
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 class Bogie {
-    private String name;
-    private int capacity;
+    String name;
+    int capacity;
 
-    public Bogie(String name, int capacity) {
+    Bogie(String name, int capacity) {
         this.name = name;
         this.capacity = capacity;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    @Override
-    public String toString() {
-        return name + " (" + capacity + " seats)";
     }
 }
 
@@ -29,23 +16,31 @@ public class TrainManagementSystem {
 
     public static void main(String[] args) {
 
-        System.out.println("=== Train Consist Management App ===");
+        System.out.println("===========================================");
+        System.out.println(" UC8 - Filter Passenger Bogies (Streams)");
+        System.out.println("===========================================\n");
 
-        // Create a list of passenger bogies
-        List<Bogie> passengerBogies = new ArrayList<>();
+        List<Bogie> bogies = new ArrayList<>();
 
-        // Add bogies with capacities
-        passengerBogies.add(new Bogie("Sleeper", 72));
-        passengerBogies.add(new Bogie("AC Chair", 54));
-        passengerBogies.add(new Bogie("First Class", 36));
+        bogies.add(new Bogie("Sleeper", 72));
+        bogies.add(new Bogie("AC Chair", 56));
+        bogies.add(new Bogie("First Class", 24));
+        bogies.add(new Bogie("General", 90));
 
-        System.out.println("\nPassenger bogies before sorting:");
-        System.out.println(passengerBogies);
+        System.out.println("Original Bogie List:");
+        for (Bogie b : bogies) {
+            System.out.println(b.name + " -> " + b.capacity);
+        }
 
-        // Sort bogies by capacity in descending order
-        passengerBogies.sort(Comparator.comparingInt(Bogie::getCapacity).reversed());
+        List<Bogie> filtered = bogies.stream()
+                .filter(b -> b.capacity > 60)
+                .collect(Collectors.toList());
 
-        System.out.println("\nPassenger bogies sorted by capacity (high to low):");
-        System.out.println(passengerBogies);
+        System.out.println("\nFiltered Bogies (Capacity > 60):");
+        for (Bogie b : filtered) {
+            System.out.println(b.name + " -> " + b.capacity);
+        }
+
+        System.out.println("\nUC8 filtering completed...");
     }
 }
