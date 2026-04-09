@@ -1,64 +1,62 @@
-import org.junit.Test;
-import java.util.*;
-import java.util.regex.Pattern;
-import static org.junit.Assert.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class TrainManagementTest {
 
-    private boolean isValidTrainId(String trainId) {
-        return Pattern.matches("TRN-\\d{4}", trainId);
+    static class GoodsBogie {
+        String type;
+        String cargo;
+
+        GoodsBogie(String type, String cargo) {
+            this.type = type;
+            this.cargo = cargo;
+        }
+
+        @Override
+        public String toString() {
+            return type + " -> " + cargo;
+        }
     }
 
-    private boolean isValidCargoCode(String cargoCode) {
-        return Pattern.matches("PET-[A-Z]{2}", cargoCode);
+    public static boolean isTrainSafe(List<GoodsBogie> goodsBogies) {
+        return goodsBogies.stream()
+                .allMatch(bogie -> {
+                    if (bogie.type.equalsIgnoreCase("Cylindrical")) {
+                        return bogie.cargo.equalsIgnoreCase("Petroleum");
+                    }
+                    return true;
+                });
     }
 
-    @Test
-    public void testRegex_ValidTrainID() {
-        assertTrue(isValidTrainId("TRN-1234"));
-    }
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<GoodsBogie> goodsBogies = new ArrayList<>();
 
-    @Test
-    public void testRegex_InvalidTrainIDFormat() {
-        assertFalse(isValidTrainId("TRN-123"));
-        assertFalse(isValidTrainId("1234-TRN"));
-        assertFalse(isValidTrainId("trn-12"));
-    }
+        System.out.println("UC12 - Safety Compliance Check for Goods Bogies");
+        System.out.print("How many bogies do you want to enter? ");
+        int count = Integer.parseInt(scanner.nextLine());
 
-    @Test
-    public void testRegex_ValidCargoCode() {
-        assertTrue(isValidCargoCode("PET-VR"));
-    }
+        for (int i = 0; i < count; i++) {
+            System.out.print("Enter bogie type (e.g., Cylindrical, Open, Box): ");
+            String type = scanner.nextLine();
+            System.out.print("Enter cargo (e.g., Petroleum, Coal, Grain): ");
+            String cargo = scanner.nextLine();
+            goodsBogies.add(new GoodsBogie(type, cargo));
+        }
 
-    @Test
-    public void testRegex_InvalidCargoCodeFormat() {
-        assertFalse(isValidCargoCode("PET- PVR"));
-        assertFalse(isValidCargoCode("PET-V"));
-        assertFalse(isValidCargoCode("PET-12"));
-    }
+        System.out.println("\nGoods Bogies in Train:");
+        goodsBogies.forEach(System.out::println);
 
-    @Test
-    public void testRegex_TrainIDDigitLengthValidation() {
-        assertFalse(isValidTrainId("TRN-1"));
-        assertFalse(isValidTrainId("TRN-12"));
-        assertFalse(isValidTrainId("TRN-12345"));
-    }
+        boolean isSafe = isTrainSafe(goodsBogies);
+        System.out.println("\nSafety Compliance Status: " + isSafe);
+        if (isSafe) {
+            System.out.println("Train formation is SAFE.");
+        } else {
+            System.out.println("Train formation is NOT SAFE.");
+        }
 
-    @Test
-    public void testRegex_CargoCodeUppercaseValidation() {
-        assertFalse(isValidCargoCode("PET-vr"));
-        assertFalse(isValidCargoCode("pet-vr"));
-    }
-
-    @Test
-    public void testRegex_EmptyInputHandling() {
-        assertFalse(isValidTrainId(""));
-        assertFalse(isValidCargoCode(""));
-    }
-
-    @Test
-    public void testRegex_ExactPatternMatch() {
-        assertFalse(isValidTrainId("TRN-1234X"));
-        assertFalse(isValidCargoCode("PET-ABC"));
+        System.out.println("\nUC12 safety validation completed ...");
+        scanner.close();
     }
 }
