@@ -1,85 +1,76 @@
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
+/**
+ * Custom Test Runner for TrainConsistManagementApp Bubble Sort logic.
+ */
 public class TrainManagementTest {
 
-    @Test
-    void testLoopFilteringLogic() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
-        bogies.add(new TrainManagementSystem.Bogie("Sleeper", 50));
-        bogies.add(new TrainManagementSystem.Bogie("AC Chair", 80));
+    public static void main(String[] args) {
 
-        List<TrainManagementSystem.Bogie> result =
-                TrainManagementSystem.filterWithLoop(bogies);
+        System.out.println("=========================================");
+        System.out.println(" Running Bubble Sort Test Cases ");
+        System.out.println("=========================================\n");
 
-        assertEquals(2, result.size()); // both >= 50
-        assertEquals(50, result.get(0).capacity);
-        assertEquals(80, result.get(1).capacity);
+        testSort_BasicSorting();
+        testSort_AlreadySortedArray();
+        testSort_DuplicateValues();
+        testSort_SingleElementArray();
+        testSort_AllEqualValues();
+
+        System.out.println("\nAll tests execution finished.");
     }
 
-    @Test
-    void testStreamFilteringLogic() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
-        bogies.add(new TrainManagementSystem.Bogie("Sleeper", 40));
-        bogies.add(new TrainManagementSystem.Bogie("First Class", 100));
+    // --- TEST CASES ---
 
-        List<TrainManagementSystem.Bogie> result =
-                TrainManagementSystem.filterWithStream(bogies);
+    static void testSort_BasicSorting() {
+        int[] capacities = {72, 56, 24, 70, 60};
+        int[] expected = {24, 56, 60, 70, 72};
 
-        assertEquals(1, result.size());
-        assertEquals(100, result.get(0).capacity);
+        TrainManagementSystem.bubbleSort(capacities);
+        checkAndPrintResult("testSort_BasicSorting", expected, capacities);
     }
 
-    @Test
-    void testLoopAndStreamResultsMatch() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
+    static void testSort_AlreadySortedArray() {
+        int[] capacities = {24, 56, 60, 70, 72};
+        int[] expected = {24, 56, 60, 70, 72};
 
-        for (int i = 0; i < 10; i++) {
-            bogies.add(new TrainManagementSystem.Bogie("Bogie-" + i, i * 10));
+        TrainManagementSystem.bubbleSort(capacities);
+        checkAndPrintResult("testSort_AlreadySortedArray", expected, capacities);
+    }
+
+    static void testSort_DuplicateValues() {
+        int[] capacities = {72, 56, 56, 24};
+        int[] expected = {24, 56, 56, 72};
+
+        TrainManagementSystem.bubbleSort(capacities);
+        checkAndPrintResult("testSort_DuplicateValues", expected, capacities);
+    }
+
+    static void testSort_SingleElementArray() {
+        int[] capacities = {50};
+        int[] expected = {50};
+
+        TrainManagementSystem.bubbleSort(capacities);
+        checkAndPrintResult("testSort_SingleElementArray", expected, capacities);
+    }
+
+    static void testSort_AllEqualValues() {
+        int[] capacities = {40, 40, 40};
+        int[] expected = {40, 40, 40};
+
+        TrainManagementSystem.bubbleSort(capacities);
+        checkAndPrintResult("testSort_AllEqualValues", expected, capacities);
+    }
+
+    // --- HELPER METHOD ---
+
+    static void checkAndPrintResult(String testName, int[] expected, int[] actual) {
+        if (Arrays.equals(expected, actual)) {
+            System.out.println("PASS: " + testName);
+        } else {
+            System.out.println("FAIL: " + testName);
+            System.out.println("Expected: " + Arrays.toString(expected));
+            System.out.println("Actual:   " + Arrays.toString(actual));
         }
-
-        List<TrainManagementSystem.Bogie> loopResult =
-                TrainManagementSystem.filterWithLoop(bogies);
-
-        List<TrainManagementSystem.Bogie> streamResult =
-                TrainManagementSystem.filterWithStream(bogies);
-
-        assertEquals(loopResult.size(), streamResult.size());
-        assertIterableEquals(loopResult, streamResult);
-    }
-
-    @Test
-    void testExecutionTimeMeasurement() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
-
-        for (int i = 0; i < 1000; i++) {
-            bogies.add(new TrainManagementSystem.Bogie("Bogie-" + i, i % 100));
-        }
-
-        long start = System.nanoTime();
-        TrainManagementSystem.filterWithLoop(bogies);
-        long end = System.nanoTime();
-
-        long elapsed = end - start;
-        assertTrue(elapsed > 0);
-    }
-
-    @Test
-    void testLargeDatasetProcessing() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
-
-        for (int i = 0; i < 100000; i++) {
-            bogies.add(new TrainManagementSystem.Bogie("Bogie-" + i, (i % 100) + 1));
-        }
-
-        List<TrainManagementSystem.Bogie> loopResult =
-                TrainManagementSystem.filterWithLoop(bogies);
-
-        List<TrainManagementSystem.Bogie> streamResult =
-                TrainManagementSystem.filterWithStream(bogies);
-
-        assertEquals(loopResult.size(), streamResult.size());
     }
 }
