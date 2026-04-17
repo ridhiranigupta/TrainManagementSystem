@@ -4,32 +4,34 @@ import org.junit.jupiter.api.Test;
 public class TrainManagementTest {
 
     @Test
-    void testSearch_BogieFound() {
-        String[] bogieIds = {"BG101", "BG205", "BG309", "BG412", "BG550"};
-        assertTrue(TrainManagementSystem.binarySearch(bogieIds, "BG309"));
+    void testSearch_ValidArray_ItemFound() {
+        String[] bogieIds = {"BG101", "BG205", "BG309"};
+        assertTrue(TrainManagementSystem.searchBogieDefensively(bogieIds, "BG205"));
     }
 
     @Test
-    void testSearch_BogieNotFound() {
-        String[] bogieIds = {"BG101", "BG205", "BG309", "BG412", "BG550"};
-        assertFalse(TrainManagementSystem.binarySearch(bogieIds, "BG999"));
+    void testSearch_ValidArray_ItemNotFound() {
+        String[] bogieIds = {"BG101", "BG205", "BG309"};
+        assertFalse(TrainManagementSystem.searchBogieDefensively(bogieIds, "BG999"));
     }
 
     @Test
-    void testSearch_FirstElementMatch() {
-        String[] bogieIds = {"BG101", "BG205", "BG309", "BG412", "BG550"};
-        assertTrue(TrainManagementSystem.binarySearch(bogieIds, "BG101"));
+    void testSearch_EmptyArrayThrowsException() {
+        String[] emptyBogies = {};
+
+        Exception ex = assertThrows(IllegalStateException.class, () -> {
+            TrainManagementSystem.searchBogieDefensively(emptyBogies, "BG101");
+        });
+
+        assertEquals("Cannot perform search: No bogies exist in the train consist.", ex.getMessage());
     }
 
     @Test
-    void testSearch_LastElementMatch() {
-        String[] bogieIds = {"BG101", "BG205", "BG309", "BG412", "BG550"};
-        assertTrue(TrainManagementSystem.binarySearch(bogieIds, "BG550"));
-    }
+    void testSearch_NullArrayThrowsException() {
+        String[] nullBogies = null;
 
-    @Test
-    void testSearch_SingleElementArray() {
-        String[] bogieIds = {"BG101"};
-        assertTrue(TrainManagementSystem.binarySearch(bogieIds, "BG101"));
+        assertThrows(IllegalStateException.class, () -> {
+            TrainManagementSystem.searchBogieDefensively(nullBogies, "BG101");
+        });
     }
 }

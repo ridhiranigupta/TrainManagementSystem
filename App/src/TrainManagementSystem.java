@@ -1,51 +1,38 @@
-import java.util.Arrays;
-
-/**
- * MAIN CLASS - TrainManagementSystem
- * Use Case 19: Binary Search for Bogie ID
- */
 public class TrainManagementSystem {
 
     public static void main(String[] args) {
 
-        System.out.println("=========================================");
-        System.out.println(" UC19 - Binary Search for Bogie ID ");
-        System.out.println("=========================================\n");
+        System.out.println("=================================================");
+        System.out.println(" UC20 - Defensive Search (Empty Train Handling) ");
+        System.out.println("=================================================\n");
 
-        String[] sortedBogieIds = {"BG101", "BG205", "BG309", "BG412", "BG550"};
-
+        String[] emptyBogieIds = {};
         String searchId = "BG412";
 
-        System.out.println("Available Sorted Bogie IDs:");
-        System.out.println(Arrays.toString(sortedBogieIds) + "\n");
+        System.out.println("Scenario: Searching empty train consist...");
 
-        boolean found = binarySearch(sortedBogieIds, searchId);
-
-        if (found) {
-            System.out.println("Bogie " + searchId + " found in train consist.");
-        } else {
-            System.out.println("Bogie " + searchId + " not found in train consist.");
+        try {
+            boolean found = searchBogieDefensively(emptyBogieIds, searchId);
+            System.out.println("Result: " + found);
+        } catch (IllegalStateException e) {
+            System.out.println("\n[ERROR CAUGHT] Operation Stopped Immediately.");
+            System.out.println("Message: " + e.getMessage());
         }
 
-        System.out.println("\nUC19 search completed ...");
+        System.out.println("\nUC20 defensive programming completed ...");
     }
 
-    // Binary Search Method
-    public static boolean binarySearch(String[] arr, String target) {
-        int low = 0;
-        int high = arr.length - 1;
+    public static boolean searchBogieDefensively(String[] arr, String target) {
 
-        while (low <= high) {
-            int mid = low + (high - low) / 2;
+        // Defensive check
+        if (arr == null || arr.length == 0) {
+            throw new IllegalStateException("Cannot perform search: No bogies exist in the train consist.");
+        }
 
-            int cmp = target.compareTo(arr[mid]);
-
-            if (cmp == 0) {
+        // Linear search
+        for (String id : arr) {
+            if (id.equals(target)) {
                 return true;
-            } else if (cmp > 0) {
-                low = mid + 1;
-            } else {
-                high = mid - 1;
             }
         }
 
