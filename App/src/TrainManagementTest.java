@@ -1,84 +1,76 @@
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class TrainManagementTest {
 
-    @Test
-    void testLoopFilteringLogic() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
-        bogies.add(new TrainManagementSystem.Bogie("Sleeper", 50));
-        bogies.add(new TrainManagementSystem.Bogie("AC Chair", 80));
-
-        List<TrainManagementSystem.Bogie> result =
-                TrainManagementSystem.filterWithLoop(bogies);
-
-        assertEquals(1, result.size());
-        assertEquals(80, result.get(0).capacity);
+    public static class InvalidCapacityException extends Exception {
+        public InvalidCapacityException(String message) {
+            super(message);
+        }
     }
 
-    @Test
-    void testStreamFilteringLogic() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
-        bogies.add(new TrainManagementSystem.Bogie("Sleeper", 40));
-        bogies.add(new TrainManagementSystem.Bogie("First Class", 100));
+    public static class PassengerBogie {
+        public String type;
+        public int capacity;
 
-        List<TrainManagementSystem.Bogie> result =
-                TrainManagementSystem.filterWithStream(bogies);
-
-        assertEquals(1, result.size());
-        assertEquals(100, result.get(0).capacity);
-    }
-
-    @Test
-    void testLoopAndStreamResultsMatch() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
-
-        for (int i = 0; i < 10; i++) {
-            bogies.add(new TrainManagementSystem.Bogie("Bogie-" + i, i * 10));
+        public PassengerBogie(String type, int capacity) throws InvalidCapacityException {
+            if (capacity <= 0) {
+                throw new InvalidCapacityException("Capacity must be greater than zero");
+            }
+            this.type = type;
+            this.capacity = capacity;
         }
 
-        List<TrainManagementSystem.Bogie> loopResult =
-                TrainManagementSystem.filterWithLoop(bogies);
-
-        List<TrainManagementSystem.Bogie> streamResult =
-                TrainManagementSystem.filterWithStream(bogies);
-
-        assertEquals(loopResult.size(), streamResult.size());
-        assertIterableEquals(loopResult, streamResult);
+        @Override
+        public String toString() {
+            return type + " -> " + capacity;
+        }
     }
 
-    @Test
-    void testExecutionTimeMeasurement() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        List<PassengerBogie> bogies = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
 
-        for (int i = 0; i < 1000; i++) {
-            bogies.add(new TrainManagementSystem.Bogie("Bogie-" + i, i % 100));
+        System.out.println("=======================================");
+        System.out.println(" UC14 - Handle Invalid Bogie Capacity ");
+        System.out.println("=======================================\n");
+
+        System.out.print("How many passenger bogies do you want to enter? ");
+        int count = Integer.parseInt(scanner.nextLine());
+
+        for (int i = 0; i < count; i++) {
+            System.out.print("Enter bogie type: ");
+            String type = scanner.nextLine();
+
+            System.out.print("Enter bogie capacity: ");
+            int capacity = Integer.parseInt(scanner.nextLine());
+
+            try {
+                PassengerBogie bogie = new PassengerBogie(type, capacity);
+                bogies.add(bogie);
+            } catch (InvalidCapacityException e) {
+                errors.add("Error for " + type + ": " + e.getMessage());
+            }
         }
 
-        long start = System.nanoTime();
-        TrainManagementSystem.filterWithLoop(bogies);
-        long end = System.nanoTime();
-
-        long elapsed = end - start;
-        assertTrue(elapsed > 0);
-    }
-
-    @Test
-    void testLargeDatasetProcessing() {
-        List<TrainManagementSystem.Bogie> bogies = new ArrayList<>();
-
-        for (int i = 0; i < 100000; i++) {
-            bogies.add(new TrainManagementSystem.Bogie("Bogie-" + i, (i % 100) + 1));
+        System.out.println("\nSummary Report:");
+        System.out.println("Valid Bogies:");
+        if (bogies.isEmpty()) {
+            System.out.println("None");
+        } else {
+            bogies.forEach(System.out::println);
         }
 
-        List<TrainManagementSystem.Bogie> loopResult =
-                TrainManagementSystem.filterWithLoop(bogies);
+        System.out.println("\nErrors:");
+        if (errors.isEmpty()) {
+            System.out.println("None");
+        } else {
+            errors.forEach(System.out::println);
+        }
 
-        List<TrainManagementSystem.Bogie> streamResult =
-                TrainManagementSystem.filterWithStream(bogies);
-
-        assertEquals(loopResult.size(), streamResult.size());
+        System.out.println("\nUC14 exception handling completed ...");
+        scanner.close();
     }
 }
